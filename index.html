@@ -216,9 +216,8 @@
 
     <div class="topbar">
       <div class="left">
-        <button id="btnParticipant">Modo Participante</button>
-        <button id="btnPresenter">Modo Telão</button>
-        <button id="btnCalcTop" class="primary">Gerar diagnóstico</button>
+        <button id="btnParticipant">Preencher Diagnóstico</button>
+        <button id="btnCalcTop" class="primary">Gerar Relatório</button>
         <button id="btnPrint">Exportar PDF</button>
         <button id="btnResetTop">Limpar</button>
       </div>
@@ -472,7 +471,7 @@
         </div>
 
         <div class="btns">
-          <button id="btnCalc" class="primary">Gerar diagnóstico</button>
+          <button id="btnCalc" class="primary">Gerar Relatório</button>
           <button id="btnReset">Limpar</button>
         </div>
       </section>
@@ -530,7 +529,7 @@
 
         <div class="divider"></div>
 
-        <h2 class="section-title">Convite para aprofundamento</h2>
+        <h2 class="section-title">Avance para uma sessão estratégica aprofundada</h2>
         <p id="ctaText" class="muted" style="line-height:1.5;margin:0;">
           Seu diagnóstico mostra sinais importantes sobre estrutura, operação, dados e capacidade de crescimento.
           O próximo passo pode ser uma conversa estratégica para aprofundar a leitura e definir prioridades.
@@ -539,19 +538,14 @@
         <div class="divider"></div>
 
         <div id="scheduleSection" class="hidden">
-          <h2 class="section-title">Agende uma conversa</h2>
-          <p class="muted" style="line-height:1.5;margin:0 0 12px 0;">
-            Se fizer sentido para você, o próximo passo é agendar uma conversa para aprofundar o diagnóstico e discutir prioridades.
-          </p>
-
           <div class="btns" style="margin-top:0;">
             <a
-              href="https://outlook.office.com/book/Redde1@redde.com.br/?ismsaljsauthenabled"
+              href="https://chk.eduzz.com/G92KA1KXWE"
               target="_blank"
               rel="noopener noreferrer"
               class="schedule-link"
             >
-              Agenda online
+              Agendar Sessão Estratégica
             </a>
           </div>
         </div>
@@ -905,6 +899,11 @@
       });
     }
 
+    function setPresenterMode(on){
+      document.body.classList.toggle('presenter', on);
+      localStorage.setItem('escPresenterMode', on ? '1' : '0');
+    }
+
     async function calculate(){
       const a = getAnswers();
 
@@ -932,9 +931,9 @@
       const nextSteps = buildNextSteps(a, maturity, risk);
 
       byId('resultTag').className = `tag ${maturity.cls}`;
-      byId('resultTag').textContent = `Diagnóstico gerado • ${maturity.name}`;
+      byId('resultTag').textContent = `Relatório gerado • ${maturity.name}`;
       byId('statusTag').className = 'tag ok';
-      byId('statusTag').textContent = 'Diagnóstico gerado';
+      byId('statusTag').textContent = 'Relatório gerado';
 
       byId('scoreValue').textContent = `${maturityScore}/100`;
       byId('scoreClass').textContent = maturity.name;
@@ -962,6 +961,8 @@
         'Seu diagnóstico mostra sinais importantes sobre estrutura, operação, dados e capacidade de crescimento. O próximo passo pode ser uma conversa estratégica para aprofundar a leitura e definir prioridades.';
 
       byId('scheduleSection').classList.remove('hidden');
+
+      setPresenterMode(true);
 
       const internalSummary = buildInternalSummary(
         a, fit, fitScore, maturity, maturityScore, risk, growth, moment,
@@ -1014,10 +1015,10 @@
 
         if(sendResult.ok){
           byId('statusTag').className = 'tag ok';
-          byId('statusTag').textContent = 'Diagnóstico gerado • Resumo interno enviado';
+          byId('statusTag').textContent = 'Relatório gerado • Resumo interno enviado';
         } else {
           byId('statusTag').className = 'tag warn';
-          byId('statusTag').textContent = 'Diagnóstico gerado • Resumo interno pendente';
+          byId('statusTag').textContent = 'Relatório gerado • Resumo interno pendente';
           console.error('Erro ao enviar resumo interno:', sendResult);
         }
       }
@@ -1052,11 +1053,7 @@
       byId('scheduleSection').classList.add('hidden');
       byId('statusTag').className = 'tag warn';
       byId('statusTag').textContent = 'Aguardando preenchimento';
-    }
-
-    function setPresenterMode(on){
-      document.body.classList.toggle('presenter', on);
-      localStorage.setItem('escPresenterMode', on ? '1' : '0');
+      setPresenterMode(false);
     }
 
     byId('btnCalc').addEventListener('click', calculate);
@@ -1064,7 +1061,6 @@
     byId('btnReset').addEventListener('click', resetAll);
     byId('btnResetTop').addEventListener('click', resetAll);
     byId('btnPrint').addEventListener('click', async () => { await calculate(); window.print(); });
-    byId('btnPresenter').addEventListener('click', () => setPresenterMode(true));
     byId('btnParticipant').addEventListener('click', () => setPresenterMode(false));
 
     const savedMode = localStorage.getItem('escPresenterMode') === '1';
